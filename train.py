@@ -79,7 +79,7 @@ for ep in range(par.epochs):
         test_loss_mean += float(loss)
 
     test_loss_mean /= len(test_loader)
-    print('Test Elapse Time: {} Mean Loss: {}'.format(time.time() - start, loss_mean))
+    print('Test Elapse Time: {} Mean Loss: {}'.format(time.time() - start, test_loss_mean))
 
     # Save model if the test loss decreases
     if test_loss_mean < min_test_loss:
