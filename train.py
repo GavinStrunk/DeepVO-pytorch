@@ -6,7 +6,7 @@ from params import par
 from model import DeepVO
 from kitti_datasets import ImageSequenceDataset
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print('Device: {}'.format(device))
 
 # Create the data loaders
@@ -29,7 +29,9 @@ test_loader = DataLoader(test_dataset,
                          shuffle=True)
 
 # Load the model
-model = DeepVO(par.img_h, par.img_w, par.batch_norm).to(device)
+model = DeepVO(par.img_h, par.img_w, par.batch_norm)
+#model = torch.nn.DataParallel(model)
+model.to(device)
 model.train()
 optimizer = torch.optim.Adagrad(model.parameters(), lr=0.001)
 

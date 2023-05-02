@@ -3,9 +3,9 @@ import os
 
 class Parameters():
     def __init__(self):
-        self.n_processors = 8
+        self.n_processors = 64
         # Path
-        self.dataset_dir = '/media/Data/Datasets/KITTI/odometry/dataset'
+        self.dataset_dir = '/home/gstrunk/Datasets/KITTI/odometry/dataset'
 
         self.train_video = ['00', '01', '02', '08', '09']
         self.valid_video = ['03', '04', '05', '06', '07', '10']
@@ -38,8 +38,8 @@ class Parameters():
         self.clip = None
         self.batch_norm = True
         # Training
-        self.epochs = 250
-        self.batch_size = 8
+        self.epochs = 200
+        self.batch_size = 64
         self.pin_mem = True
         self.optim = {'opt': 'Adagrad', 'lr': 0.001}
         # Choice:
