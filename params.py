@@ -1,11 +1,24 @@
 import os
 
+def get_dataset_dir_root():
+    """Checks for the DATASET_DIR_ROOT environment variable
+
+    This environment variable is assumed to be set to the root directory of all datasets.
+    :return: absolute directory path
+    :raises: EnvironmentError
+    """
+    dataset_dir = os.environ.get('DATASET_DIR_ROOT')
+    if dataset_dir is None:
+        raise EnvironmentError(
+            "Could not find environment variable DATASET_DIR_ROOT. Set this variable to the root directory of the dataset folder")
+
+    return dataset_dir
 
 class Parameters():
     def __init__(self):
         self.n_processors = 64
         # Path
-        self.dataset_dir = '/home/gstrunk/Datasets/KITTI/odometry/dataset'
+        self.dataset_dir = get_dataset_dir_root() + '/KITTI/odometry/dataset'
 
         self.train_video = ['00', '01', '02', '08', '09']
         self.valid_video = ['03', '04', '05', '06', '07', '10']
@@ -99,6 +112,7 @@ class Parameters():
         #     os.makedirs(os.path.dirname(self.save_optimzer_path))
         # if not os.path.isdir(os.path.dirname(self.train_data_info_path)):
         #     os.makedirs(os.path.dirname(self.train_data_info_path))
+
 
 
 par = Parameters()

@@ -6,6 +6,16 @@ from params import par
 from model import DeepVO
 from kitti_datasets import ImageSequenceDataset
 
+def get_loss(model, x, y):
+    predicted = model.forward(x)
+    # y = y[:, 1:, :]  # (batch, seq, dim_pose)
+    # Weighted MSE Loss
+    angle_loss = torch.nn.functional.mse_loss(predicted[:, :3], y[:, :3])
+    translation_loss = torch.nn.functional.mse_loss(predicted[:, 3:], y[:, 3:])
+    loss = (100 * angle_loss + translation_loss)
+    return loss
+
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print('Device: {}'.format(device))
 
@@ -30,7 +40,7 @@ test_loader = DataLoader(test_dataset,
 
 # Load the model
 model = DeepVO(par.img_h, par.img_w, par.batch_norm)
-#model = torch.nn.DataParallel(model)
+model = torch.nn.DataParallel(model)
 model.to(device)
 model.train()
 optimizer = torch.optim.Adagrad(model.parameters(), lr=0.001)
@@ -44,8 +54,13 @@ for ep in range(par.epochs):
     loss_mean = 0
     loss_list = []
     for idx, (data, label) in enumerate(train_loader):
-        loss = model.step(data.to(device), label.to(device), optimizer)
+        optimizer.zero_grad()
 
+        # loss = model.step(data.to(device), label.to(device), optimizer)
+        loss = get_loss(model, data.to(device), label.to(device))
+        loss.backward()
+        optimizer.step()
+        
         loss_list.append(loss)
         loss_mean += float(loss)
 
@@ -57,7 +72,8 @@ for ep in range(par.epochs):
     test_loss_mean = 0
     test_loss_list = []
     for idx, (data, label) in enumerate(test_loader):
-        loss = model.get_loss(data.to(device), label.to(device)).data.cpu().numpy()
+        # loss = model.get_loss(data.to(device), label.to(device)).data.cpu().numpy()
+        loss = get_loss(model, data.to(device), label.to(device)).data.cpu().numpy()
 
         test_loss_list.append(loss)
         test_loss_mean += float(loss)
